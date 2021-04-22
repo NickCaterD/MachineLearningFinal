@@ -2,6 +2,7 @@
 
 import numpy as np
 import cv2
+import os
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Conv2D, Dropout, Flatten, MaxPooling2D
 from tensorflow.keras import optimizers
@@ -13,6 +14,19 @@ input_shape = (512, 512, 3)
 classes = 10
 
 # Import data from pretrain to arrays somehow
+"""
+path = 'data/preprocessed_images'
+
+for file_path in os.listdir(path):
+    # alternatively, loop through a txt list of filenames
+    # or loop though pandas array and take file_path from list and join with path
+    
+    im = cv2.imread(os.path.join(path, file_path))
+    label = ?
+    X.append(im)
+    Y.append(label)
+    
+""" 
 X = []
 Y = []
 # populate arrays here and then make sure its all as a numpy array
