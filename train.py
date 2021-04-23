@@ -11,25 +11,24 @@ import DefineModel
 
 # Define variables
 input_shape = (512, 512, 3)
-classes = 10
+classes = 11
 
 # Import data from pretrain to arrays somehow
-"""
-path = 'data/preprocessed_images'
-
-for file_path in os.listdir(path):
-    # alternatively, loop through a txt list of filenames
-    # or loop though pandas array and take file_path from list and join with path
-    
-    im = cv2.imread(os.path.join(path, file_path))
-    label = ?
-    X.append(im)
-    Y.append(label)
-    
-""" 
 X = []
 Y = []
-# populate arrays here and then make sure its all as a numpy array
+
+path = 'data/preprocessed_images'
+
+# for file_path in os.listdir(path):
+# alternatively, loop through a txt list of filenames
+# or loop though pandas array and take file_path from list and join with path
+for row in dataframe:
+    file_name = row[1]
+    label = row[2]
+    im = cv2.imread(os.path.join(path, file_name))
+    X.append(im)
+    Y.append(label)    
+# convert to numpy array for training
 X = np.array(X)
 Y = np.array(Y)
 
@@ -41,7 +40,7 @@ model = DefineModel.createModel(input_shape,classes)
 print(model.summary())
 
 # compile model, might need changes to loss and optimizer
-"""
+
 model.compile(optimizer='adam', 
               loss='categorical_crossentropy', 
               metrics=['accuracy'])
@@ -50,6 +49,7 @@ sgd = optimizers.SGD(lr = 0.01, decay=1e-6, momentum=0.9, nesterov=True)
 model.compile(optimizer=sgd,
               loss='categorical_crossentropy',
               metrics=['accuracy'])
+"""
 
 print('-TRAINING----------------------------')
 print('Input shape:', X.shape)
