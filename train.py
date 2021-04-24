@@ -17,15 +17,11 @@ classes = 11
 X = []
 Y = []
 
-path = 'data/preprocessed_images'
+path = '/MachineLearningFinal/ODIR\-5K/ODIR\-5K/Training\sImages'
 
-# for file_path in os.listdir(path):
-# alternatively, loop through a txt list of filenames
-# or loop though pandas array and take file_path from list and join with path
-for row in dataframe:
-    file_name = row[1]
-    label = row[2]
+for file_name in os.listdir(path):
     im = cv2.imread(os.path.join(path, file_name))
+    label = np.loadtext(os.path.join('labels', file_name))
     X.append(im)
     Y.append(label)    
 # convert to numpy array for training
