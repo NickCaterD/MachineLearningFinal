@@ -4,11 +4,17 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Conv2D, Dropout, Flatten, MaxPooling2D, BatchNormalization, AveragePooling2D
 from tensorflow.keras import optimizers
 
+data augmentation = tf.keras.Sequential([
+    layers.experimental.preprocessing.RandomFlip('horizontal_and_vertical'),
+    #layers,experimental.preprocessing.RandomRotation(0.2),
+    ])
+
+
 def createModel(input_shape,classes):
     
     # Creating a Sequential Model and adding the layers
-    model = Sequential()
-
+    model = Sequential(data_augmentation)
+    
     model.add(Conv2D(32, kernel_size=(7,7), strides = (1,1),padding = 'same', activation='relu', input_shape=input_shape))
     model.add(BatchNormalization())
     model.add(MaxPooling2D(pool_size=(2,2)))
