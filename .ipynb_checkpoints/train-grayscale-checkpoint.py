@@ -14,7 +14,7 @@ import data_aug
 from data_aug import master_augment
 
 # Define variables
-input_shape = (227, 227, 3)
+input_shape = (227, 227,1)
 classes = 11
 
 start = time.time()
@@ -42,7 +42,9 @@ for file_name in os.listdir(path):
 #         break
 
     #lines = text_file.read().split(',')
+    im = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
     im = cv2.resize(im,(227,227))
+    #im = im[:, :, np.newaxis]
     augmented_images = data_aug.master_augment(im)
     for img in augmented_images:
         X.append(img/255)
@@ -53,6 +55,7 @@ for file_name in os.listdir(path):
 X = np.array(X, dtype = np.float32)
 Y = np.array(Y, dtype = np.float32)
 
+X = X.reshape(len(X),227,227,1)
 
 
 print(np.shape(X), np.shape(X[0]))
@@ -64,7 +67,7 @@ print(model.summary())
 
 # compile model, might need changes to loss and optimizer
 
-model.compile(optimizer=optimizers.Adam(epsilon = 1.0), 
+model.compile(optimizer=optimizers.Adam(epsilon = 0.1), 
               loss='categorical_crossentropy', 
               metrics=['accuracy'])
 
@@ -86,7 +89,7 @@ x_train, x_valid, y_train, y_valid = train_test_split(X, Y, train_size=0.8,test_
 
 # Def change epochs and batch size
 # 
-history = model.fit(x=x_train,y=y_train, epochs=20, batch_size = 1024, validation_data=(x_valid, y_valid))
+history = model.fit(x=x_train,y=y_train, epochs=20, batch_size = 512, validation_data=(x_valid, y_valid))
 
 # serialize weights to HDF5
 model.save_weights("model_weights2.h5")
@@ -99,7 +102,7 @@ plt.legend(['Training loss', 'Validation Loss'],fontsize=18)
 plt.xlabel('Epochs ',fontsize=16)
 plt.ylabel('Loss',fontsize=16)
 plt.title('Loss Curves',fontsize=16)
-plt.savefig('Loss_curves2.jpg')
+plt.savefig('loss_curve_grayscale2.jpg')
 plt.show()
 
 # Accuracy Curves
@@ -110,5 +113,6 @@ plt.legend(['Training Accuracy', 'Validation Accuracy'],fontsize=18)
 plt.xlabel('Epochs ',fontsize=16)
 plt.ylabel('Accuracy',fontsize=16)
 plt.title('Accuracy Curves',fontsize=16)
-plt.savefig('accuracy_curves2.jpg')
+plt.savefig('training_curve_grayscale2.jpg')
 plt.show()
+

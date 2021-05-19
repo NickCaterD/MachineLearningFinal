@@ -1,5 +1,3 @@
-# Train model on ocular disease images
-
 import numpy as np
 import cv2
 import os
@@ -8,12 +6,15 @@ from tensorflow.keras.layers import Dense, Conv2D, Dropout, Flatten, MaxPooling2
 from tensorflow.keras import optimizers
 from sklearn.model_selection import train_test_split
 import DefineModel_OCTnet
+import DefineModel
 import time
 import re
 import matplotlib.pyplot as plt
+import data_aug
+from data_aug import master_augment
 
 # Define variables
-input_shape = (512, 512, 3)
+input_shape = (227, 227, 3)
 classes = 11
 
 start = time.time()
@@ -30,41 +31,51 @@ for file_name in os.listdir(path):
         break
     im = cv2.imread(os.path.join(path_preproc, file_name))
     if np.shape(im) != (512,512,3):
-        print(file_name, np.shape(im))
         continue
     split = re.split(r'[.,]',file_name)
     label_name = split[0] + '.txt'
     label = np.loadtxt(os.path.join('labels', label_name))
     count+=1
-    if count == 10:
-        break
+    if (count%500 == 0):
+        print(count)
+#     if count == 3000:
+#         break
 
     #lines = text_file.read().split(',')
-    im = im/255
-    X.append(im)
-    Y.append(label)    
+    im = cv2.resize(im,(227,227))
+    augmented_images = data_aug.master_augment(im)
+    for img in augmented_images:
+        X.append(img/255)
+        Y.append(label)
+           
     
 # convert to numpy array for training
-X = np.array(X, dtype = np.float)
-Y = np.array(Y, dtype = np.float)
+X = np.array(X, dtype = np.float32)
+Y = np.array(Y, dtype = np.float32)
+
 
 
 print(np.shape(X), np.shape(X[0]))
 print(np.shape(Y))
-model = DefineModel.createModel(input_shape,classes)
+model = DefineModel_OCTnet.createModel(input_shape,classes)
 print(model.summary())
+
+
 
 # compile model, might need changes to loss and optimizer
 
-model.compile(optimizer='adam', 
+model.compile(optimizer=optimizers.Adam(epsilon = 0.1), 
               loss='categorical_crossentropy', 
               metrics=['accuracy'])
-"""
-sgd = optimizers.SGD(lr = 0.01, decay=1e-6, momentum=0.9, nesterov=True)
-model.compile(optimizer=sgd,
-              loss='categorical_crossentropy',
-              metrics=['accuracy'])
-"""
+
+#data augmentation
+
+##
+# sgd = optimizers.SGD(lr = 0.001, decay=1e-6, momentum=0.9, nesterov=True)
+# model.compile(optimizer=sgd,
+#               loss='categorical_crossentropy',
+#               metrics=['accuracy'])
+
 
 print('-TRAINING----------------------------')
 # print('Input shape:', X.shape)
@@ -75,10 +86,10 @@ x_train, x_valid, y_train, y_valid = train_test_split(X, Y, train_size=0.8,test_
 
 # Def change epochs and batch size
 # 
-history = model.fit(x=x_train,y=y_train, epochs=10, validation_data=(x_valid, y_valid))
+history = model.fit(x=x_train,y=y_train, epochs=20, batch_size = 1024, validation_data=(x_valid, y_valid))
 
 # serialize weights to HDF5
-model.save_weights("model_weights.h5")
+model.save_weights("model_weights2.h5")
 
 # Loss Curves
 plt.figure(figsize=[8,6])
@@ -88,6 +99,7 @@ plt.legend(['Training loss', 'Validation Loss'],fontsize=18)
 plt.xlabel('Epochs ',fontsize=16)
 plt.ylabel('Loss',fontsize=16)
 plt.title('Loss Curves',fontsize=16)
+plt.savefig('Loss_curves2.jpg')
 plt.show()
 
 # Accuracy Curves
@@ -98,6 +110,5 @@ plt.legend(['Training Accuracy', 'Validation Accuracy'],fontsize=18)
 plt.xlabel('Epochs ',fontsize=16)
 plt.ylabel('Accuracy',fontsize=16)
 plt.title('Accuracy Curves',fontsize=16)
+plt.savefig('accuracy_curves2.jpg')
 plt.show()
-
-print(time.time()-start)
