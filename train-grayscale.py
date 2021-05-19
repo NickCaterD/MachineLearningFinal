@@ -89,10 +89,10 @@ x_train, x_valid, y_train, y_valid = train_test_split(X, Y, train_size=0.8,test_
 
 # Def change epochs and batch size
 # 
-history = model.fit(x=x_train,y=y_train, epochs=20, batch_size = 512, validation_data=(x_valid, y_valid))
+history = model.fit(x=x_train,y=y_train, epochs=10, batch_size = 512, validation_data=(x_valid, y_valid))
 
 # serialize weights to HDF5
-model.save_weights("model_weights2.h5")
+model.save_weights("model_weights_grayscale.h5")
 
 # Loss Curves
 plt.figure(figsize=[8,6])
